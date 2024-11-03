@@ -111,16 +111,16 @@ help_instruction = "<b>Инcтрукция пользования ботом Fol
     "\n"\
     "   /help – Подробная инструкция пользования ботом."
 
-create_group_folder_instruction = "Создание \"Папки группы\"."\
-    "\n\n"\
-    "Отправьте название папки. Она будет автоматически создана полностью публичной, "\
-    "т.е. все ее могут редактировать (возможность создания папок с одним редактором "\
-    "будет добавлена в следующих обновлениях)."\
-    "\n\n"\
-    "В группе с ботом вызовите команду /start и отправьте туда ссылку на эту папку."\
-    "\n\n"\
-    "Изменять эту и все папки в ней могут все пользователи. Чтобы другим пользователям "\
-    "изменять эту папку - им нужно по ссылке добавить папку к себе (в личные сообщения с ботом)."
+# create_group_folder_instruction = "Создание \"Папки группы\"."\
+#     "\n\n"\
+#     "Отправьте название папки. Она будет автоматически создана полностью публичной, "\
+#     "т.е. все ее могут редактировать (возможность создания папок с одним редактором "\
+#     "будет добавлена в следующих обновлениях)."\
+#     "\n\n"\
+#     "В группе с ботом вызовите команду /start и отправьте туда ссылку на эту папку."\
+#     "\n\n"\
+#     "Изменять эту и все папки в ней могут все пользователи. Чтобы другим пользователям "\
+#     "изменять эту папку - им нужно по ссылке добавить папку к себе (в личные сообщения с ботом)."
 
 
 
@@ -128,13 +128,13 @@ add_group_folder = "Отправьте название папки"
 add_group_link = "Отправьте ссылку на папку"
 
 
-made_by_text = "FolderTelegramBot: version 2.0"\
+made_by_text = "FoldersTelegramBot Version 2.0"\
     "\n\n"\
     "Designed and created by @Jakov_Manishek."\
     "\n"\
     "Сreated based on the library aiogram 3+."\
     "\n\n"\
-    "Git проекта: <code>https://github.com/JakovManishek/FolderTelegramBot</code>"\
+    "Git проекта: <code>https://github.com/JakovManishek/FoldersTelegramBot</code>"\
     "\n\n"\
     "Следующие обновления: возможность создания папки OC-MA-OE "\
     "(публичная папка с одним редактором при создании папки для группы). Общее исправление ошибок."
@@ -142,60 +142,77 @@ made_by_text = "FolderTelegramBot: version 2.0"\
 
 
 # Main message
-empty_text = "Тут пока пусто, чтобы <b>Добавить</b> папку или медиа - нажмите на кнопку \"<b>Добавить</b>\"."
+def name_fold_text(folder_name: str, private_mode: int, vertex_type: str) -> str:
+    if vertex_type != "U":
+        return f"Открыта <b>{'приватная' if private_mode == 1 else 'публичная'}</b> папка:\n{folder_name}."
+    else:
+        return f"Открыта папка:\n{folder_name}."
 
-private_link_text = "Это приватная папка. Cсылку на нее нельзя скопировать."
-
-def located_vertices(delete_mode: bool):
-    return f"Снизу рассположены папки и медиа, чтобы <b>\{'Удалить' if delete_mode else 'Добавить'}</b> - нажмите на папку/медиа."
-
-def name_fold_text(folder_name: str) -> str:
-    return f"Открыта папка:\n{folder_name}."
 
 def link_fold_text(folder_link: str) -> str:
     return f"Ссылка на папку:\n<code>{folder_link}</code>."
 
 
-# is used
-def start_text(chat_type: str,
-               folder_link: str,
-                  folder_name: str,
-                  private_mode: int,
-                  delete_mode: bool,
-                  is_empty: bool,
-                  head_text: str | None = ""
-                  ) -> str:
-    
+empty_text = "Тут пока пусто."
 
-    answer_text = ""
+not_empty_text = "Снизу рассположены папки и медиа."
 
-    if private_mode != -1:
-        answer_text += f"{name_fold_text(folder_name)}\n\n"
-    
+public_located_vertices = "Чтобы <b>Добавить</b> папку или медиа - нажмите на кнопку \"<b>Добавить</b>\"."
 
-    if delete_mode:
-        answer_text += f"{located_vertices(delete_mode)}"
-        return answer_text
+private_located_vertices = "Это приватная папка. Изменять ее содержимое может только создатель."
 
-    if private_mode in [0, 2]:
-        answer_text += f"{link_fold_text(folder_link)}\n\n"
-    if private_mode == 1:
-        answer_text += f"{private_link_text}\n\n"
+delete_vertices = "Чтобы <b>Удалить</b> папку или медиа - нажмите на папку/медиа."
+
+
+def dif_head_text(head_text: str, private_mode: int, is_empty: bool) -> str:
+
+    if head_text != "":
+        return head_text
 
     if is_empty:
-        if private_mode in [-1, 2] and chat_type != "private" and head_text == "":
-            answer_text += "Тут пока пусто"
-        else:
-            answer_text += empty_text
+        head_ans = empty_text
     else:
-        if head_text == "":
-            answer_text += located_vertices(False)
+        head_ans = not_empty_text
+
+    if private_mode == 0:
+        head_ans += f" {public_located_vertices}"
+    else:
+        head_ans += f" {private_located_vertices}"
+
+    return head_ans
+        
+
+
+
+def start_text(chat_type: str,
+               folder_link: str,
+               folder_name: str,
+               vertex_type: str,
+               private_mode: int,
+               delete_mode: bool,
+               is_empty: bool,
+               head_text: str | None = ""
+               ) -> str:
+    
+    if vertex_type == "U" and chat_type == "private":
+        answer_text = ""
+    else:
+        answer_text = f"{name_fold_text(folder_name, private_mode, vertex_type)}\n\n"
+    
+    if delete_mode:
+        answer_text += delete_vertices
+        return answer_text
+    
+    if vertex_type == "U" and chat_type == "private":
+        answer_text += f"{head_text}\n\n{empty_text if is_empty else not_empty_text} {public_located_vertices}"
+    elif vertex_type == "U":
+        answer_text += f"{link_fold_text(folder_link)}\n\n"
+        if head_text != "":
+            answer_text += f"{head_text}\n\n{empty_text if is_empty else not_empty_text}"
         else:
-            answer_text += head_text
+            answer_text += empty_text if is_empty else not_empty_text
+    else:
+        answer_text += f"{link_fold_text(folder_link)}\n\n"
+        answer_text += dif_head_text(head_text, private_mode, is_empty)
 
     return answer_text
-
-
-
-
-
