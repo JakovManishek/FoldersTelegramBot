@@ -6,12 +6,12 @@ from math import ceil
     
 
 def inline_start_kb(chat_id: int,
-              autor_id: int,
-              chat_type: str,
-              folder_type: str,
-              private_mode: int,
-              delete_mode: bool,
-              next_vertices: list[str]) -> InlineKeyboardMarkup:
+                    autor_id: int,
+                    chat_type: str,
+                    vertex_type: str,
+                    private_mode: int,
+                    delete_mode: bool,
+                    next_vertices: list[str]) -> InlineKeyboardMarkup:
 
 
     pages = [int(page) for page in db_functions.get_value_db("Users", "pages", chat_id).split("\\")]
@@ -20,22 +20,17 @@ def inline_start_kb(chat_id: int,
 
     kb = []
 
-    # print("9:", kb)
-
-    # if chat_type != "private":
-    #     return InlineKeyboardMarkup(inline_keyboard=kb)
 
     if cnt_page == 0:
-        if chat_type == "private":
+        if chat_type == "private" and ((private_mode == 1 and autor_id == chat_id) or private_mode == 0):
             kb += [[InlineKeyboardButton(text="Изменить текст папки", callback_data=f"head")]]
             kb += [[InlineKeyboardButton(text="Добавить", callback_data='add')]]
 
-        if private_mode != -1:
+        if vertex_type != "U":
             kb += [[InlineKeyboardButton(text="Назад", callback_data='back')]]
 
         return InlineKeyboardMarkup(inline_keyboard=kb)
     
-    # print("8:", kb)
 
     if page < 1:
         pages[-1] = 1
@@ -53,8 +48,9 @@ def inline_start_kb(chat_id: int,
 
 
     for ind in range(start, stop):
-        vertex_type, vertex_id = next_vertices[ind].split(":")
-        name = db_functions.get_value_db("Folders" if vertex_type == "F" else "Files", "name", vertex_id)
+        type, id = next_vertices[ind].split(":")
+        id = int(id)
+        name = db_functions.get_value_db("Folders" if type == "F" else "Files", "name", id)
 
         kb.append([InlineKeyboardButton(text=name, callback_data=next_vertices[ind])])
 
@@ -62,12 +58,13 @@ def inline_start_kb(chat_id: int,
             InlineKeyboardButton(text=f"{page}/{cnt_page}", callback_data="pagina_view"),
             InlineKeyboardButton(text=">>", callback_data="pagina_next")]]
     
+    print("3: ", delete_mode, chat_type, private_mode, vertex_type)
     if not delete_mode:
-        if (autor_id == chat_id or private_mode == 2) and chat_type == "private":
+        if chat_type == "private" and ((private_mode == 1 and autor_id == chat_id) or private_mode == 0):
             kb += [[InlineKeyboardButton(text="Изменить текст папки", callback_data=f"head")],
                         [InlineKeyboardButton(text=f"Добавить", callback_data=f"add"),
                         InlineKeyboardButton(text=f"Удалить", callback_data=f"delete")]]
-        if folder_type == "F":       
+        if vertex_type != "U":     
             kb += [[InlineKeyboardButton(text="Назад", callback_data="back")]]
 
     else:
@@ -75,20 +72,6 @@ def inline_start_kb(chat_id: int,
 
     # print("4:", kb)
     
-    return InlineKeyboardMarkup(inline_keyboard=kb, resize_keyboard=True, row_width=1)
-
-
-def inline_create_group_kb() -> InlineKeyboardMarkup:
-
-    kb = [[InlineKeyboardButton(text="Создать папку для группы", callback_data="group_folder")]]
-
-    return InlineKeyboardMarkup(inline_keyboard=kb, resize_keyboard=True, row_width=1)
-
-
-def inline_add_group_kb() -> InlineKeyboardMarkup:
-
-    kb = [[InlineKeyboardButton(text="Прислать ссылку на папку", callback_data="add")]]
-
     return InlineKeyboardMarkup(inline_keyboard=kb, resize_keyboard=True, row_width=1)
 
 
