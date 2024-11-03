@@ -136,8 +136,7 @@ made_by_text = "FoldersTelegramBot Version 2.0"\
     "\n\n"\
     "Git проекта: <code>https://github.com/JakovManishek/FoldersTelegramBot</code>"\
     "\n\n"\
-    "Следующие обновления: возможность создания папки OC-MA-OE "\
-    "(публичная папка с одним редактором при создании папки для группы). Общее исправление ошибок."
+    "Следующие обновления: Уменьшение спама. Общее исправление ошибок."
 
 
 
@@ -216,3 +215,6 @@ def start_text(chat_type: str,
         answer_text += dif_head_text(head_text, private_mode, is_empty)
 
     return answer_text
+
+
+
