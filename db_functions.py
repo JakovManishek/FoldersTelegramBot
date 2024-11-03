@@ -31,11 +31,11 @@ def delete_DFS(vertex_type: str, vertex_id: int, chat_id: int, fl_cnt: bool | No
     autor_id = get_value_db("Folders", "autor_id", vertex_id)
     cnt = get_value_db("Folders", "count_of_users", vertex_id)
 
+    print("9: ", cnt, autor_id, chat_id, delete_id, vertex_id)
     if cnt > 1:
         delete_id["change_cnt"].append(vertex_id)
         fl_cnt = False
-    if autor_id != chat_id:
-        return delete_id
+        
     if not fl_cnt:
         return delete_id
     
@@ -55,20 +55,20 @@ def delete_DFS(vertex_type: str, vertex_id: int, chat_id: int, fl_cnt: bool | No
     return delete_id
 
 
-def add_cnt_DFS(vertex_type: str, vertex_id: int) -> dict[str, list[int]]:
+def change_cnt_DFS(vertex_type: str, vertex_id: int, change: int | None = 1) -> dict[str, list[int]]:
     
     if vertex_type == "D":
         return
 
     cnt = get_value_db("Folders", "count_of_users", vertex_id)
-    set_value_db("Folders", "count_of_users", vertex_id, cnt + 1)
+    set_value_db("Folders", "count_of_users", vertex_id, cnt + change)
     
     next_vertices = get_value_db("Folders", "next_vertices", vertex_id).split(";")
     next_vertices = [] if next_vertices[-1] == "" else next_vertices
 
     for type, id in [[elem.split(":")[0], int(elem.split(":")[-1])] for elem in next_vertices]:
 
-        add_cnt_DFS(type, id)
+        change_cnt_DFS(type, id, change)
 
 
 
@@ -83,15 +83,6 @@ def is_user_in_table(chat_id: int) -> bool:    # Проверка на нали�
         return True
     
 
-def is_folder_good(vertex_id: int) -> bool:    # Проверка на наличе папки в таблице
-    with sqlite3.connect('database.db') as con:
-        cur = con.cursor()
-        cur.execute('SELECT private_mode FROM Folders WHERE id = ?', (vertex_id,))
-        fetch = cur.fetchone()
-
-        if not (fetch is None) and fetch[0] == 2:
-            return True
-        return False
 
 
 
@@ -145,11 +136,13 @@ def get_full_parameters(folder_id: int) -> list[str | int]:
 
 
 
-def create_user(chat_id: int) -> int:    # Шаг 1
+def create_user(chat_id: int, chat_type: str, name: str) -> int:    # Шаг 1
+
+    private_mode = 1 if chat_type == "private" else 0
 
     with sqlite3.connect('database.db') as con:
         cur = con.cursor()
-        cur.execute("INSERT INTO Folders (autor_id, private_mode) VALUES (?, ?)", (chat_id, -1))
+        cur.execute("INSERT INTO Folders (name, autor_id, private_mode) VALUES (?, ?, ?)", (name, chat_id, private_mode))
 
         cur.execute("INSERT INTO Users (chat_id, path) VALUES (?, ?)", (chat_id, f"U:{cur.lastrowid}"))
 
@@ -162,18 +155,19 @@ def create(chat_id: int, lvl: str, name: str, private_mode: int | None = None, f
 
     vertex_id = int(get_value_db("Users", "path", chat_id).split("\\")[-1].split(":")[-1])
 
-    autor_id = get_value_db("Folders", "autor_id", vertex_id)
-    # if autor_id != chat_id:
-    #     raise KeyError("You cannot change this folder")
-    
     next_vertices = get_value_db("Folders", "next_vertices", vertex_id).split(";")
     next_vertices = [] if next_vertices[0] == "" else next_vertices
 
+    if lvl == "fold":
+        cnt_users = get_value_db("Folders", "count_of_users", vertex_id)
+    else:
+        cnt_users = None
+    print("8: ", cnt_users, vertex_id)
 
     with sqlite3.connect('database.db') as con:
         cur = con.cursor()
         if lvl == "fold":
-            cur.execute("INSERT INTO Folders (private_mode, name, autor_id) VALUES (?, ?, ?)", (private_mode, name, chat_id))
+            cur.execute("INSERT INTO Folders (private_mode, name, autor_id, count_of_users) VALUES (?, ?, ?, ?)", (private_mode, name, chat_id, cnt_users))
         else:
             cur.execute("INSERT INTO Files (file_id, name, file_type) VALUES (?, ?, ?)", (file_id, name, file_type))
         last_row_id = cur.lastrowid
@@ -186,25 +180,23 @@ def create(chat_id: int, lvl: str, name: str, private_mode: int | None = None, f
     return last_row_id
 
 
-def add_folder(chat_id: int, next_vertex_id: int) -> None:    # Шаг 3.1
+def add_folder(chat_id: int, new_vertex_type: str, new_vertex_id: int) -> None:    # Шаг 3.1
 
     vertex_type, vertex_id = get_value_db("Users", "path", chat_id).split("\\")[-1].split(":")
     vertex_id = int(vertex_id)
 
     path_id = [int(ids.split(":")[-1]) for ids in get_value_db("Users", "path", chat_id).split("\\")]
     
-    private_mode = get_value_db("Folders", "private_mode", next_vertex_id)
-
-    if not private_mode in [0, 2]:
-        raise KeyError("You cannot add a private folder")
-    if not cycle_BFS([next_vertex_id], path_id):
+    
+    if not cycle_BFS([new_vertex_id], path_id):
         raise KeyError("You cannot add the same folder to a folder")
 
     next_vertices = get_value_db("Folders", "next_vertices", vertex_id).split(";")
     next_vertices = [] if next_vertices[0] == "" else next_vertices
 
-    set_value_db("Folders", "next_vertices", vertex_id, ";".join([*next_vertices, f"F:{next_vertex_id}"]))
-    add_cnt_DFS(vertex_type, vertex_id)
+    set_value_db("Folders", "next_vertices", vertex_id, ";".join([*next_vertices, f"F:{new_vertex_id}"]))
+    print("7:", new_vertex_type, new_vertex_id)
+    change_cnt_DFS(new_vertex_type, new_vertex_id, 1)
 
     
 def delete(chat_id: int, vertex: str) -> None:    # Шаг 3.2
@@ -214,7 +206,7 @@ def delete(chat_id: int, vertex: str) -> None:    # Шаг 3.2
     id = get_value_db("Users", "path", chat_id).split("\\")[-1].split(":")[-1]
     next_vertices = get_value_db("Folders", "next_vertices", id).split(";")
     next_vertices = [] if next_vertices[0] == "" else next_vertices
-    print("3:", delete_id, next_vertices, vertex_type, vertex_id, id)
+    print("6:", delete_id, next_vertices, vertex_type, vertex_id, id)
     next_vertices.remove(vertex)
     set_value_db("Folders", "next_vertices", id, ";".join(next_vertices))
 
@@ -229,5 +221,4 @@ def delete(chat_id: int, vertex: str) -> None:    # Шаг 3.2
         cur = con.cursor()
 
         for id in delete_id["change_cnt"]:
-            cnt = get_value_db("Folders", "count_of_users", id)
-            set_value_db("Folders", "count_of_users", id, cnt - 1)
+            change_cnt_DFS("F", id, -1)
