@@ -3,16 +3,13 @@ import config
 import asyncio
 import db_functions
 import text
-import os
-import Admin
-import re
 
 
 from math import ceil
 from time import sleep
-from aiogram import Bot, Dispatcher, Router, F
-from aiogram.types import CallbackQuery, Message, ContentType, ReplyKeyboardRemove
-from aiogram.filters import CommandStart, Command, Filter, CommandObject
+from aiogram import Bot, Dispatcher, F
+from aiogram.types import CallbackQuery, Message
+from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.exceptions import TelegramBadRequest
@@ -21,9 +18,9 @@ from aiogram.client.bot import DefaultBotProperties
 from aiogram.client.session.aiohttp import AiohttpSession
 
 
-# session = AiohttpSession(proxy='http://proxy.server:3128')
-# bot = Bot(token=config.BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML), session=session)
-bot = Bot(token=config.BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+session = AiohttpSession(proxy='http://proxy.server:3128')
+bot = Bot(token=config.BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML), session=session)
+# bot = Bot(token=config.BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
 
 
@@ -48,11 +45,17 @@ async def clear_chat(chat_id: int, message_id: int) -> None:
         pass
 
 
-async def check_user_in_table(message: Message, chat_id: int) -> None:
+async def check_user_in_table(message: Message) -> None:
+    chat_id = message.chat.id
+    chat_type = message.chat.type
+
+    name = message.chat.title
+    if name is None:
+        name = message.chat.username
+
     if not db_functions.is_user_in_table(chat_id):
-        db_functions.create_user(chat_id)
-        if message.chat.type == "private":
-            await message.answer(text=text.new_chat_message)
+        db_functions.create_user(chat_id, chat_type, name)
+        # await message.answer(text=text.new_chat_message)
 
 
 async def send_start_message(level_message_type: str,
@@ -67,14 +70,41 @@ async def send_start_message(level_message_type: str,
         chat_type = callback.message.chat.type
         chat_id = callback.message.chat.id
 
-    folder_type, vertex_id = db_functions.get_value_db("Users", "path", chat_id).split("\\")[-1].split(":")
-    delete_mode = db_functions.get_value_db("Users", "delete_mode", chat_id)
-    vertex_id = int(vertex_id)
-    private_mode = db_functions.get_value_db("Folders", "private_mode", vertex_id)
 
-    param = db_functions.get_full_parameters(vertex_id)
+    vertex_type, vertex_id = db_functions.get_value_db("Users", "path", chat_id).split("\\")[-1].split(":")
+    vertex_id = int(vertex_id)
+
+
+    try:
+        delete_mode = db_functions.get_value_db("Users", "delete_mode", chat_id)
+        private_mode = db_functions.get_value_db("Folders", "private_mode", vertex_id)
+        autor_id = db_functions.get_value_db("Folders", "autor_id", vertex_id)
+        param = db_functions.get_full_parameters(vertex_id)
+    except Exception as ex:
+        print("5: ", ex, ex.args)
+        path = db_functions.get_value_db("Users", "path", chat_id).split("\\")
+        db_functions.set_value_db("Users", "path", chat_id, path[0])
+        db_functions.set_value_db("Users", "pages", chat_id, 1)
+
+        await send_start_message(level_message_type="callback", callback=callback)
+        return    
+
     next_vertices = [] if param[3].split(";")[0] == "" else  param[3].split(";")
 
+    print(next_vertices)
+    i = 0
+    while i < len(next_vertices):
+        print(i)
+        try:
+            type, id = next_vertices[i].split(":")
+            if type != "D":
+                test = db_functions.get_value_db("Folders", "id", int(id))
+        except Exception as ex:
+            print(ex, ex.args)
+            next_vertices.pop(i)
+        else:
+            i += 1
+    db_functions.set_value_db("Folders", "next_vertices", vertex_id, ";".join(next_vertices))
 
     pages = [int(page) for page in db_functions.get_value_db("Users", "pages", chat_id).split("\\")]
     if change_page != 0:
@@ -82,23 +112,25 @@ async def send_start_message(level_message_type: str,
         db_functions.set_value_db("Users", "pages", chat_id, "\\".join([str(page) for page in pages]))
     if len(next_vertices) == 0:
         db_functions.set_value_db("Users", "delete_mode", chat_id, 0)
+        delete_mode = 0
 
     print(vertex_id, param)
-    text_message=text.start_text( chat_type=chat_type,
-                                folder_link=config.encoding_folder(f"{folder_type}:{vertex_id}", param[0]),
-                                folder_name=param[0],
-                                private_mode=param[2],
-                                delete_mode=delete_mode,
-                                is_empty=(len(next_vertices) == 0),
-                                head_text=param[4]
+    text_message=text.start_text(chat_type=chat_type,
+                                 folder_link=config.encoding_folder(f"{vertex_type}:{vertex_id}", param[0]),
+                                 folder_name=param[0],
+                                 vertex_type=vertex_type,
+                                 private_mode=param[2],
+                                 delete_mode=delete_mode,
+                                 is_empty=(len(next_vertices) == 0),
+                                 head_text=param[4]
     )
     reply_markup=kb.inline_start_kb(chat_id=chat_id,
-                                autor_id=param[1],
-                                chat_type=chat_type,
-                                folder_type=folder_type,
-                                private_mode=private_mode,
-                                delete_mode=delete_mode,
-                                next_vertices=next_vertices
+                                    autor_id=autor_id,
+                                    chat_type=chat_type,
+                                    vertex_type=vertex_type,
+                                    private_mode=private_mode,
+                                    delete_mode=delete_mode,
+                                    next_vertices=next_vertices
     )
 
 
@@ -118,17 +150,7 @@ async def send_start_message(level_message_type: str,
 @dp.message(CommandStart())
 async def start(message: Message):
 
-    chat_id = message.chat.id
-
-    await check_user_in_table(message, chat_id)
-
-
-    if message.chat.type != "private":
-        row_id = int(db_functions.get_value_db("Users", "path", chat_id).split(":")[-1])
-        next_vertices_string = db_functions.get_value_db("Folders", "next_vertices", row_id)
-        if next_vertices_string == "":
-            await message.answer(text=text.add_group_folder_text, reply_markup=kb.inline_add_group_kb())
-            return
+    await check_user_in_table(message)
 
     await send_start_message(level_message_type="message", message=message)
 
@@ -136,12 +158,6 @@ async def start(message: Message):
 @dp.message(Command('help'))
 async def help(message: Message):
     await message.answer(text=text.help_instruction)
-
-
-@dp.message(Command('group_folder'))
-async def group_folder(message: Message):
-    if message.chat.type == "private":
-        await message.answer(text=text.create_group_folder_instruction, reply_markup=kb.inline_create_group_kb())
 
 
 @dp.message(Command('made_by'))
@@ -155,19 +171,25 @@ async def made_by(message: Message):
 async def inline_callback(callback: CallbackQuery, state: FSMContext):
     
     await state.clear()
-    chat_type = callback.message.chat.type
     chat_id = callback.message.chat.id
     call = str(callback.data)
 
 
-    vertex_id = int(db_functions.get_value_db("Users", "path", chat_id).split("\\")[-1].split(":")[-1])
-    private_mode = db_functions.get_value_db("Folders", "private_mode", vertex_id)
-    next_vertices = db_functions.get_value_db("Folders", "next_vertices", vertex_id).split(";")
+    vertex_type, vertex_id = db_functions.get_value_db("Users", "path", chat_id).split("\\")[-1].split(":")
+    vertex_id = int(vertex_id)
+    try:
+        next_vertices = db_functions.get_value_db("Folders", "next_vertices", vertex_id).split(";")
+    except:
+        path = db_functions.get_value_db("Users", "path", chat_id).split("\\")
+        db_functions.set_value_db("Users", "path", chat_id, path[0])
+        db_functions.set_value_db("Users", "pages", chat_id, 1)
+        await send_start_message(level_message_type="callback", callback=callback)
+        return
+
     next_vertices = [] if next_vertices[0] == "" else  next_vertices
+
     page = int(db_functions.get_value_db("Users", "pages", chat_id).split("\\")[-1])
     cnt_page = ceil(len(next_vertices) / 10)
-
-    root_folder_type = ...
     
 
     match call:
@@ -182,36 +204,21 @@ async def inline_callback(callback: CallbackQuery, state: FSMContext):
             
         case 'add':
             await callback.answer()
+
             await state.set_state(OrderAdd.new_vertices)
+            await callback.message.answer(text=text.add_vertex_text, reply_markup=kb.reply_media_group_kb())
             await state.update_data(cnt=1)
-
-            if chat_type != "private":
-                await callback.message.answer(text=text.add_group_link)
-                await state.update_data(for_what="group")
-            elif private_mode == 2:
-                await callback.message.answer(text=text.add_vertex_text, reply_markup=kb.reply_media_group_kb())
-                await state.update_data(for_what="group")
-            else:
-                await callback.message.answer(text=text.add_vertex_text, reply_markup=kb.reply_media_group_kb())
-                await state.update_data(for_what="bot")
-
-            # if chat_type != "private" or private_mode == 2:
-            #     await state.update_data(for_what="group")
-            # else:
-            #     await state.update_data(for_what="bot")
 
         case 'delete':
             await callback.answer()
 
             db_functions.set_value_db("Users", "delete_mode", chat_id, 1)
-
             await send_start_message(level_message_type="callback", callback=callback)
 
         case 'delete_back':
             await callback.answer()
 
             db_functions.set_value_db("Users", "delete_mode", chat_id, 0)
-
             await send_start_message(level_message_type="callback", callback=callback)
 
         case 'pagina_back':
@@ -244,13 +251,6 @@ async def inline_callback(callback: CallbackQuery, state: FSMContext):
             db_functions.set_value_db("Users", "pages", chat_id, "\\".join(pages))
 
             await send_start_message(level_message_type="callback", callback=callback)
-
-        case "group_folder":
-            await callback.answer()
-
-            await callback.message.answer(text=text.add_group_folder)
-            await state.set_state(OrderAdd.new_vertices)
-            await state.update_data(for_what="group")
 
         case _:
             await callback.answer()
@@ -318,30 +318,18 @@ async def regex_link_add_private(message: Message, state: FSMContext):
     
     chat_id = message.chat.id
     decode = config.decoding_folder(message.text)
-    new_vertex_id = int(decode[0].split(":")[-1])
-    user_data = await state.get_data()
+    new_vertex_type, new_vertex_id = decode[0].split(":")
+    new_vertex_id = int(new_vertex_id)
 
 
-    if user_data["for_what"] == "group":
-
-        if db_functions.is_folder_good(new_vertex_id):
-            # row_id = int(db_functions.get_value_db("Users", "path", chat_id).split(":")[-1])
-            db_functions.add_folder(chat_id, new_vertex_id)
-        else:
-            await message.answer("Эту папку нельзя добавить")
-
-    if user_data["for_what"] == "bot":
-        try:
-            db_functions.add_folder(chat_id, new_vertex_id)
-        except TypeError:
-            await message.answer(text=text.link_is_not_valid_error)
-        except KeyError as ex:
-            if ex == "You cannot add a private folder":
-                await message.answer(text=text.private_folder_error)
-            else:
-                await message.answer(text=text.doublicate_folder_error)
-        else:
-            await message.answer(f"Добавлена папка: {decode[-1]}")
+    try:
+        db_functions.add_folder(chat_id, new_vertex_type, new_vertex_id)
+    except TypeError:
+        await message.answer(text=text.link_is_not_valid_error)
+    except KeyError:
+        await message.answer(text=text.doublicate_folder_error)
+    else:
+        await message.answer(f"Добавлена папка: {decode[-1]}")
 
 
     await state.clear()
@@ -351,31 +339,13 @@ async def regex_link_add_private(message: Message, state: FSMContext):
 @dp.message(F.text, OrderAdd.new_vertices)
 async def folder_name_chosen(message: Message, state: FSMContext):
 
-    chat_id = message.chat.id
-    user_data = await state.get_data()
-    
-    
     if message.text == "Завершить добавление":
         await state.clear()
         await send_start_message(level_message_type="message", message=message)
         return
     
-    if user_data["for_what"] == "group":
-        try:
-            print(chat_id, user_data)
-            db_functions.create(chat_id, "fold", message.text, 2)
-            print("yes")
-        except:
-            await message.answer(text=text.long_name_error)
-        else:
-            await message.answer(text=text.folder_is_create_text(message.text.lower(), message.text))
-
-        await state.clear()
-        await send_start_message(level_message_type="message", message=message)
-    
-    else:
-        await state.update_data(folder_name=message.text)
-        await message.answer(text.choose_name_text, reply_markup=kb.reply_choose_private_kb())
+    await state.update_data(folder_name=message.text)
+    await message.answer(text.choose_name_text, reply_markup=kb.reply_choose_private_kb())
 
     await state.set_state(OrderAdd.folder_mode)
 
@@ -387,7 +357,7 @@ async def private_chosen(message: Message, state: FSMContext):
     chat_id = message.chat.id
 
     if message.text in ['Приватная', 'Публичная']:
-        private_mode = 1 if message.text.lower() == 'приватная' else 0
+        private_mode = 1 if message.text == 'Приватная' else 0
         try:
             db_functions.create(chat_id,  "fold", user_data['folder_name'], private_mode)
         except:
@@ -462,7 +432,7 @@ async def set_heat_text(message: Message, state: FSMContext):
 
 
 @dp.message(F.text)
-async def other_text(message: Message, state: FSMContext):
+async def other_text(message: Message):
     chat_type = message.chat.type
     if chat_type == "private":
         await message.answer(text=text.incorrectly_text_error)
