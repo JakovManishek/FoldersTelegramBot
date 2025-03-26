@@ -1,72 +1,92 @@
-"""
-Модуль для работы с базой данных SQLite.
-
-Содержит функции для:
-- Создания структуры базы данных
-- Инициализации таблиц
-"""
-
 import sqlite3
+from pathlib import Path
 
 
-def create_db(db_name: str = 'database_hackathon.db') -> bool:
+def create_db(db_path: str = 'database.db') -> bool:
     """
-    Создает базу данных и таблицы, если они не существуют.
+    Создает базу данных SQLite с необходимыми таблицами.
     
     Args:
-        db_name (str): Название файла базы данных
+        db_path: Путь к файлу базы данных (по умолчанию 'database.db')
         
     Returns:
-        bool: True если создание прошло успешно, False при ошибке
+        bool: True если создание прошло успешно, иначе False
+        
+    Raises:
+        sqlite3.Error: В случае ошибок работы с базой данных
     """
     try:
-        with sqlite3.connect(db_name) as conn:
-            cursor = conn.cursor()
+        # Создаем директорию для базы данных, если её нет
+        db_file = Path(db_path)
+        db_file.parent.mkdir(parents=True, exist_ok=True)
+
+        with sqlite3.connect(db_path) as con:
+            cur = con.cursor()
             
             # Создание таблицы Users
-            cursor.execute("""
+            cur.execute("""
                 CREATE TABLE IF NOT EXISTS Users (
-                    user_id INTEGER PRIMARY KEY,
-                    username TEXT
+                    chat_id INTEGER PRIMARY KEY,
+                    messages_id TEXT NOT NULL DEFAULT "",
+                    pages TEXT NOT NULL DEFAULT "1",
+                    delete_mode INTEGER NOT NULL DEFAULT 0,
+                    path TEXT NOT NULL DEFAULT ""
                 )
             """)
             
-            # Создание таблицы Cards
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS Cards (
-                    card_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER,
-                    card_name TEXT NOT NULL,
-                    category TEXT NOT NULL,
-                    cashback REAL NOT NULL,
-                    FOREIGN KEY (user_id) REFERENCES Users (user_id)
+            # Создание таблицы Folders
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS Folders (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT NOT NULL DEFAULT "None",
+                    autor_id INTEGER,
+                    private_mode INTEGER NOT NULL,
+                    count_of_users INTEGER NOT NULL DEFAULT 1,
+                    next_vertices TEXT NOT NULL DEFAULT "",
+                    head_text TEXT NOT NULL DEFAULT ""
                 )
             """)
             
-            # Создание индексов для ускорения запросов
-            cursor.execute("""
-                CREATE INDEX IF NOT EXISTS idx_cards_user_id 
-                ON Cards (user_id)
+            # Создание таблицы Files
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS Files (
+                    id INTEGER PRIMARY KEY,
+                    file_id TEXT NOT NULL,
+                    name TEXT NOT NULL,
+                    file_type TEXT NOT NULL
+                )
             """)
             
-            cursor.execute("""
-                CREATE INDEX IF NOT EXISTS idx_cards_category 
-                ON Cards (category)
+            # Создание индексов для улучшения производительности
+            cur.execute("""
+                CREATE INDEX IF NOT EXISTS idx_folders_autor_id 
+                ON Folders(autor_id)
             """)
             
-            conn.commit()
-            return True
+            cur.execute("""
+                CREATE INDEX IF NOT EXISTS idx_users_path 
+                ON Users(path)
+            """)
             
+            con.commit()
+            
+        print(f"База данных успешно создана: {db_path}")
+        return True
+        
     except sqlite3.Error as ex:
-        print(f"[ОШИБКА БАЗЫ ДАННЫХ] {ex}")
+        print(f"Ошибка при создании базы данных: {ex}")
         return False
     except Exception as ex:
-        print(f"[НЕИЗВЕСТНАЯ ОШИБКА] {ex}")
+        print(f"Неожиданная ошибка: {ex}")
         return False
 
 
 if __name__ == "__main__":
-    if create_db():
-        print("База данных успешно создана")
+    # Создаем базу данных в поддиректории 'database'
+    DB_DIR = Path(__file__).parent / "database"
+    DB_PATH = str(DB_DIR / "database.db")
+    
+    if create_db(DB_PATH):
+        print("Инициализация базы данных завершена успешно")
     else:
-        print("Произошла ошибка при создании базы данных")
+        print("Ошибка инициализации базы данных")
