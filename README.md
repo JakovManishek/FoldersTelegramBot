@@ -3,6 +3,7 @@
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 ![Aiogram](https://img.shields.io/badge/aiogram-3.x-green)
 ![Algorithms](https://img.shields.io/badge/algorithms-BFS%2C%20DFS-yellow)
+![SQLite](https://img.shields.io/badge/database-SQLite-yellow)
 ![License](https://img.shields.io/badge/license-MIT-orange)
 
 Бот для организации файлового хранилища в Telegram с иерархической системой папок.
