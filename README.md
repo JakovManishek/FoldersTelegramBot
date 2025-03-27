@@ -9,16 +9,19 @@
 
 ## Пример работы
 
-<div align="left">
+<div align="center">
   <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
-    <div style="text-align: center; margin: 10px; width: 45%;">
+    <div style="text-align: center; margin: 10px; width: 30%;">
       <img src="screenshots/screenshots1.png" width="30%"/>
-      <img src="screenshots/screenshots2.png" width="30%"/>
       <p><em>Рис. 1: Главный интерфейс</em></p>
     </div>
-    <div style="text-align: center; margin: 10px; width: 45%;">
+    <div style="text-align: center; margin: 10px; width: 30%;">
+      <img src="screenshots/screenshots2.png" width="30%"/>
+      <p><em>Рис. 2: Главный интерфейс</em></p>
+    </div>
+    <div style="text-align: center; margin: 10px; width: 30%;">
       <img src="screenshots/screenshots3.png" width="30%"/>
-      <p><em>Рис. 2: Меню настроек</em></p>
+      <p><em>Рис. 3: Меню настроек</em></p>
     </div>
   </div>
 </div>
