@@ -10,19 +10,19 @@
 ## Пример работы
 
 <div align="center">
-  <table>
-    <tr>
-      <td style="text-align: center; padding: 10px;">
-        <img src="screenshots/screenshots1.png" style="max-width: 300px; width: 100%;" alt="Главный экран"/>
-        <p><em>Рис. 1: Главный интерфейс</em></p>
+  <table style="border-collapse: collapse; border-spacing: 0;">
+    <tr style="vertical-align: bottom;">
+      <td style="text-align: center; padding: 10px; border: none;">
+        <img src="screenshots/screenshots1.png" style="max-width: 300px; width: 100%; vertical-align: bottom;" alt="Главный экран"/>
+        <p style="margin-top: 8px; margin-bottom: 0;"><em>Рис. 1: Главный интерфейс</em></p>
       </td>
-      <td style="text-align: center; padding: 10px;">
-        <img src="screenshots/screenshots2.png" style="max-width: 300px; width: 100%;" alt="Настройки"/>
-        <p><em>Рис. 2: Меню настроек</em></p>
+      <td style="text-align: center; padding: 10px; border: none;">
+        <img src="screenshots/screenshots2.png" style="max-width: 300px; width: 100%; vertical-align: bottom;" alt="Настройки"/>
+        <p style="margin-top: 8px; margin-bottom: 0;"><em>Рис. 2: Меню настроек</em></p>
       </td>
-      <td style="text-align: center; padding: 10px;">
-        <img src="screenshots/screenshots3.png" style="max-width: 300px; width: 100%;" alt="Результат"/>
-        <p><em>Рис. 3: Пример результата</em></p>
+      <td style="text-align: center; padding: 10px; border: none;">
+        <img src="screenshots/screenshots3.png" style="max-width: 300px; width: 100%; vertical-align: bottom;" alt="Результат"/>
+        <p style="margin-top: 8px; margin-bottom: 0;"><em>Рис. 3: Пример результата</em></p>
       </td>
     </tr>
   </table>
