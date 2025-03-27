@@ -9,11 +9,11 @@
 
 ## Пример работы
 
-<div align="center">
+<div align="left">
   <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
     <div style="text-align: center; margin: 10px; width: 45%;">
-      <img src="screenshots/screenshots1.png" width="20%"/>
-      <img src="screenshots/screenshots2.png" width="20%"/>
+      <img src="screenshots/screenshots1.png" width="30%"/>
+      <img src="screenshots/screenshots2.png" width="30%"/>
       <p><em>Рис. 1: Главный интерфейс</em></p>
     </div>
     <div style="text-align: center; margin: 10px; width: 45%;">
