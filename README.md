@@ -7,6 +7,20 @@
 
 Бот для организации файлового хранилища в Telegram с иерархической системой папок.
 
+## Пример работы
+
+
+
+<img src="screenshots/screenshots1.png" width="50%"/>
+
+
+
+<img src="screenshots/screenshots2.png" width="50%"/>
+
+
+
+<img src="screenshots/screenshots3.png" width="50%"/>
+
 ## Особенности
 
 - Система вложенных папок
