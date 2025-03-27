@@ -10,20 +10,22 @@
 ## Пример работы
 
 <div align="center">
-  <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px;">
-    <div style="text-align: center; flex: 1 1 30%; min-width: 250px;">
-      <img src="screenshots/screenshots1.png" style="width: 100%; max-width: 400px; height: auto;" alt="Главный экран"/>
-      <p><em>Рис. 1: Главный интерфейс</em></p>
-    </div>
-    <div style="text-align: center; flex: 1 1 30%; min-width: 250px;">
-      <img src="screenshots/screenshots2.png" style="width: 100%; max-width: 400px; height: auto;" alt="Настройки"/>
-      <p><em>Рис. 2: Меню настроек</em></p>
-    </div>
-    <div style="text-align: center; flex: 1 1 30%; min-width: 250px;">
-      <img src="screenshots/screenshots3.png" style="width: 100%; max-width: 400px; height: auto;" alt="Результат"/>
-      <p><em>Рис. 3: Пример результата</em></p>
-    </div>
-  </div>
+  <table>
+    <tr>
+      <td style="text-align: center; padding: 10px;">
+        <img src="screenshots/screenshots1.png" style="max-width: 300px; width: 100%;" alt="Главный экран"/>
+        <p><em>Рис. 1: Главный интерфейс</em></p>
+      </td>
+      <td style="text-align: center; padding: 10px;">
+        <img src="screenshots/screenshots2.png" style="max-width: 300px; width: 100%;" alt="Настройки"/>
+        <p><em>Рис. 2: Меню настроек</em></p>
+      </td>
+      <td style="text-align: center; padding: 10px;">
+        <img src="screenshots/screenshots3.png" style="max-width: 300px; width: 100%;" alt="Результат"/>
+        <p><em>Рис. 3: Пример результата</em></p>
+      </td>
+    </tr>
+  </table>
 </div>
 
 <div align="center">
