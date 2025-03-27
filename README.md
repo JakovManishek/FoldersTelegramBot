@@ -10,18 +10,18 @@
 ## Пример работы
 
 <div align="center">
-  <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
-    <div style="text-align: center; margin: 10px; width: 30%;">
-      <img src="screenshots/screenshots1.png" width="30%"/>
+  <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px;">
+    <div style="text-align: center; flex: 1 1 30%; min-width: 250px;">
+      <img src="screenshots/screenshots1.png" style="width: 100%; max-width: 400px; height: auto;" alt="Главный экран"/>
       <p><em>Рис. 1: Главный интерфейс</em></p>
     </div>
-    <div style="text-align: center; margin: 10px; width: 30%;">
-      <img src="screenshots/screenshots2.png" width="30%"/>
-      <p><em>Рис. 2: Главный интерфейс</em></p>
+    <div style="text-align: center; flex: 1 1 30%; min-width: 250px;">
+      <img src="screenshots/screenshots2.png" style="width: 100%; max-width: 400px; height: auto;" alt="Настройки"/>
+      <p><em>Рис. 2: Меню настроек</em></p>
     </div>
-    <div style="text-align: center; margin: 10px; width: 30%;">
-      <img src="screenshots/screenshots3.png" width="30%"/>
-      <p><em>Рис. 3: Меню настроек</em></p>
+    <div style="text-align: center; flex: 1 1 30%; min-width: 250px;">
+      <img src="screenshots/screenshots3.png" style="width: 100%; max-width: 400px; height: auto;" alt="Результат"/>
+      <p><em>Рис. 3: Пример результата</em></p>
     </div>
   </div>
 </div>
