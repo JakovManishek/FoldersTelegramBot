@@ -9,7 +9,17 @@
 
 ## Пример работы
 
+<div align="center">
+  <img src="screenshots/screenshots1.png" width="30%"/>
 
+
+
+   <img src="screenshots/screenshots2.png" width="30%"/>
+   
+   
+   
+   <img src="screenshots/screenshots3.png" width="30%"/>
+</div>
 
 <img src="screenshots/screenshots1.png" width="50%"/>
 
