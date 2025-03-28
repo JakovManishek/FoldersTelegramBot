@@ -9,8 +9,8 @@
 
 ## Пример работы
 
-<img src="screenshots/screenshots1.png"/>
-<p style="margin: 8px 0 0 0;"><em>Рис. 1: Главный интерфейс</em></p>
+<img src="screenshots/screenshots1.png" width="50%"/>
+<p style="margin: 10px 0 0 0;"><em>Рис. 1: Главный интерфейс</em></p>
 
 <div align="center">
   <table cellspacing="0" cellpadding="0" style="border: none;">
