@@ -9,6 +9,9 @@
 
 ## Пример работы
 
+<img src="screenshots/screenshots1.png"/>
+<p style="margin: 8px 0 0 0;"><em>Рис. 1: Главный интерфейс</em></p>
+
 <div align="center">
   <table cellspacing="0" cellpadding="0" style="border: none;">
     <tr style="vertical-align: bottom;">
