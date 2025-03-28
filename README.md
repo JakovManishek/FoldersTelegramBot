@@ -9,8 +9,10 @@
 
 ## Пример работы
 
-<img src="screenshots/screenshots1.png" width="40%"/>
-<p style="margin: 10px 0 0 0;"><em>Рис. 1: Главный интерфейс</em></p>
+<div style="text-align: center;">
+  <img src="screenshots/screenshots1.png" style="width: 40%; display: block; margin: 0 auto;"/>
+  <p style="margin: 10px 0 0 0; text-align: center;"><em>Рис. 1: Главный интерфейс</em></p>
+</div>
 
 <img src="screenshots/screenshots2.png" width="40%"/>
 <p style="margin: 10px 0 0 0;"><em>Рис. 1: Главный интерфейс</em></p>
