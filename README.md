@@ -9,14 +9,17 @@
 
 ## Пример работы
 
+Главный интерфейс
+
 <img src="screenshots/screenshots1.png" width="40%"/>
-<p style="margin: 10px 0 0 0;"><em>Главный интерфейс</em></p>
+
+Работа пагинации (2 страница)
 
 <img src="screenshots/screenshots2.png" width="40%"/>
-<p style="margin: 10px 0 0 0;"><em>Работа пагинации (2 страница)</em></p>
+
+Пример пустой папки, заполнен только head text
 
 <img src="screenshots/screenshots3.png" width="40%"/>
-<p style="margin: 10px 0 0 0;"><em>Пример пустой папки, заполнен только head text</em></p>
 
 ## Особенности
 
