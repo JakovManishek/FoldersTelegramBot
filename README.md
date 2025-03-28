@@ -9,7 +9,7 @@
 
 ## Пример работы
 
-<img src="screenshots/screenshots1.png" width="50%"/>
+<img src="screenshots/screenshots1.png" width="30%"/>
 <p style="margin: 10px 0 0 0;"><em>Рис. 1: Главный интерфейс</em></p>
 
 <div align="center">
