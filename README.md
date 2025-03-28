@@ -10,13 +10,13 @@
 ## Пример работы
 
 <img src="screenshots/screenshots1.png" width="40%"/>
-<p style="margin: 10px 0 0 0;"><em>Рис. 1: Главный интерфейс</em></p>
+<p style="margin: 10px 0 0 0;"><em>Главный интерфейс</em></p>
 
 <img src="screenshots/screenshots2.png" width="40%"/>
-<p style="margin: 10px 0 0 0;"><em>Рис. 1: Главный интерфейс</em></p>
+<p style="margin: 10px 0 0 0;"><em>Работа пагинации (2 страница)</em></p>
 
 <img src="screenshots/screenshots3.png" width="40%"/>
-<p style="margin: 10px 0 0 0;"><em>Рис. 1: Главный интерфейс</em></p>
+<p style="margin: 10px 0 0 0;"><em>Пример пустой папки, заполнен только head text</em></p>
 
 ## Особенности
 
