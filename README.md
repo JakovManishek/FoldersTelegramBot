@@ -12,40 +12,11 @@
 <img src="screenshots/screenshots1.png" width="40%"/>
 <p style="margin: 10px 0 0 0;"><em>Рис. 1: Главный интерфейс</em></p>
 
-<div align="center">
-  <table cellspacing="0" cellpadding="0" style="border: none;">
-    <tr style="vertical-align: bottom;">
-      <td style="text-align: center; padding: 10px; border: none !important;">
-        <img src="screenshots/screenshots1.png" style="max-width: 300px; width: 100%; display: block;" alt="Главный экран"/>
-        <p style="margin: 8px 0 0 0;"><em>Рис. 1: Главный интерфейс</em></p>
-      </td>
-      <td style="text-align: center; padding: 10px; border: none !important;">
-        <img src="screenshots/screenshots2.png" style="max-width: 300px; width: 100%; display: block;" alt="Настройки"/>
-        <p style="margin: 8px 0 0 0;"><em>Рис. 2: Меню настроек</em></p>
-      </td>
-      <td style="text-align: center; padding: 10px; border: none !important;">
-        <img src="screenshots/screenshots3.png" style="max-width: 300px; width: 100%; display: block;" alt="Результат"/>
-        <p style="margin: 8px 0 0 0;"><em>Рис. 3: Пример результата</em></p>
-      </td>
-    </tr>
-  </table>
-</div>
+<img src="screenshots/screenshots2.png" width="40%"/>
+<p style="margin: 10px 0 0 0;"><em>Рис. 1: Главный интерфейс</em></p>
 
-<div align="center">
-  <img src="screenshots/screenshots1.png" width="30%"/>
-  <img src="screenshots/screenshots2.png" width="30%"/>
-  <img src="screenshots/screenshots3.png" width="30%"/>
-</div>
-
-<img src="screenshots/screenshots1.png" width="50%"/>
-
-
-
-<img src="screenshots/screenshots2.png" width="50%"/>
-
-
-
-<img src="screenshots/screenshots3.png" width="50%"/>
+<img src="screenshots/screenshots3.png" width="40%"/>
+<p style="margin: 10px 0 0 0;"><em>Рис. 1: Главный интерфейс</em></p>
 
 ## Особенности
 
