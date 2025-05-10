@@ -81,4 +81,4 @@
 
 1. Клонируйте репозиторий:
 ```bash
-git clone https://github.com/JakovManishek/FoldersTelegramBot.git
+git clone https://github.com/JakovManishek/FoldersTgBot.git
